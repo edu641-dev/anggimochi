@@ -1,0 +1,2132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>질환별 맞춤 생활 수칙 및 식단 가이드</title>
+    <style>
+        /* CSS 변수 설정: 테마 색상 및 글자 크기 */
+        :root {
+            --base-font-size: 16px;
+            --primary-color: #00796b;      /* 깊은 청록색 (신뢰감, 안정감) */
+            --primary-light: #e0f2f1;      /* 아주 밝은 청록색 (배경 등) */
+            --secondary-color: #009688;    /* 밝은 청록색 (버튼, 강조) */
+            --bg-color: #f4f9f9;           /* 전체 배경색 */
+            --text-color: #333333;         /* 기본 글자색 */
+            --card-bg: #ffffff;            /* 카드 배경색 */
+            
+            --behavior-color: #e3f2fd;     /* 생활 수칙 테마색 (하늘색) */
+            --behavior-border: #4fc3f7;
+            --good-food-color: #e8f5e9;    /* 추천 식품 테마색 (연두색) */
+            --good-food-border: #81c784;
+            --bad-food-color: #ffebee;     /* 금기 식품 테마색 (연분홍색) */
+            --bad-food-border: #e57373;
+        }
+
+        /* 기본 리셋 및 스타일 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* html에 폰트 사이즈를 변수로 지정하여 확대/축소 기능 구현 */
+        html {
+            font-size: var(--base-font-size); 
+        }
+
+        body {
+            font-family: 'Pretendard', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* 헤더 (상단 제목 및 확대/축소 버튼) */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+            word-break: keep-all;
+        }
+
+        /* 텍스트 크기 조절 버튼 영역 (고령자 배려 UX) */
+        .zoom-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .zoom-controls button {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .zoom-controls button:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* 메인 컨테이너 */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* 검색창 영역 */
+        .search-section {
+            display: flex;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-section input {
+            flex: 1;
+            padding: 1rem;
+            font-size: 1.1rem;
+            border: 2px solid var(--primary-light);
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-section input:focus {
+            border-color: var(--secondary-color);
+        }
+
+        /* 카테고리 필터 영역 */
+        .category-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .category-filter button {
+            background-color: var(--card-bg);
+            border: 1px solid #ccc;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+        }
+
+        .category-filter button.active,
+        .category-filter button:hover {
+            background-color: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+
+        /* 질환 목록 영역 (그리드형 카드) */
+        .disease-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+
+        .disease-card {
+            background-color: var(--card-bg);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .disease-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            border-color: var(--secondary-color);
+        }
+        
+        .disease-card.selected {
+            border-color: var(--primary-color);
+        }
+
+        .disease-info {
+            padding: 2rem 1.2rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .disease-info h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--text-color);
+            word-break: keep-all;
+        }
+        
+        .category-badge {
+            font-size: 0.85rem;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        /* 뒤로가기 버튼 */
+        .back-btn {
+            background-color: var(--card-bg);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-light);
+            padding: 0.7rem 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: var(--primary-light);
+        }
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* 결과 카드 렌더링 영역 */
+        .result-area {
+            display: none; /* 질환 선택 전에는 숨김 처리 */
+            animation: fadeIn 0.4s ease-in-out;
+            margin-top: 1rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-title {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+        }
+
+        /* 3가지 카드 그리드 레이아웃 (반응형) */
+        .cards-container {
+            display: grid;
+            grid-template-columns: 1fr; /* 모바일: 1열 */
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .cards-container {
+                grid-template-columns: repeat(3, 1fr); /* PC: 3열 */
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-top: 6px solid transparent; /* 상단 포인트 컬러 줄 */
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card ul {
+            list-style: none;
+        }
+
+        .card li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            word-break: keep-all;
+        }
+
+        /* 리스트에 커스텀 마커(점) 추가 */
+        .card li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 1.5rem;
+            top: -4px;
+        }
+
+        /* 특화된 카드 테마 스타일 */
+        .card.behavior {
+            background-color: var(--behavior-color);
+            border-top-color: var(--behavior-border);
+        }
+        .card.behavior li::before { color: var(--behavior-border); }
+        
+        .card.good-food {
+            background-color: var(--good-food-color);
+            border-top-color: var(--good-food-border);
+        }
+        .card.good-food li::before { color: var(--good-food-border); }
+
+        .card.bad-food {
+            background-color: var(--bad-food-color);
+            border-top-color: var(--bad-food-border);
+        }
+        .card.bad-food li::before { color: var(--bad-food-border); }
+        
+        .empty-message {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            padding: 3rem 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>의료/간호 교육용 질환별 맞춤 가이드</h1>
+        <!-- 글자 크기 조절 버튼 (고령자 배려) -->
+        <div class="zoom-controls">
+            <button onclick="changeFontSize(-2)">가- 글자 축소</button>
+            <button onclick="changeFontSize(2)">가+ 글자 확대</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 1. 검색창 영역 -->
+        <div class="search-section">
+            <input type="text" id="searchInput" placeholder="질환명을 검색하세요 (예: 당뇨병, 만성 콩팥병 등)" onkeyup="filterDiseases()">
+        </div>
+
+        <!-- 2. 카테고리 필터 버튼 영역 -->
+        <div class="category-filter" id="categoryFilter">
+            <!-- 자바스크립트로 자동 생성됩니다 -->
+        </div>
+
+        <!-- 3. 질환 목록 영역 -->
+        <div class="disease-list" id="diseaseList">
+            <!-- 자바스크립트로 자동 생성됩니다 -->
+        </div>
+
+        <!-- 4. 결과(카드 3개) 영역 -->
+        <div class="result-area" id="resultArea">
+            <button class="back-btn" onclick="goBackToList()">← 목록으로 돌아가기</button>
+            <h2 class="result-title" id="resultTitle">질환 이름</h2>
+            <div class="cards-container">
+                <!-- 생활 수칙 카드 -->
+                <div class="card behavior">
+                    <h3>💡 하면 좋은 행동</h3>
+                    <ul id="behaviorList"></ul>
+                </div>
+                <!-- 추천 식품 카드 -->
+                <div class="card good-food">
+                    <h3>🥗 먹으면 좋은 음식</h3>
+                    <ul id="goodFoodList"></ul>
+                </div>
+                <!-- 금기 식품 카드 -->
+                <div class="card bad-food">
+                    <h3>🚫 피해야 할 음식</h3>
+                    <ul id="badFoodList"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // [데이터베이스]: 총 12개의 주요 질환에 대한 의학적 데이터를 배열(Array) 형태로 저장합니다.
+        const diseases = [
+            {
+                        "name": "고혈압",
+                        "category": "순환기",
+                        "behaviors": [
+                                    "정기적 혈압 측정",
+                                    "싱겁게 먹기"
+                        ],
+                        "goodFoods": [
+                                    "바나나",
+                                    "양파",
+                                    "시금치"
+                        ],
+                        "badFoods": [
+                                    "국물류",
+                                    "젓갈",
+                                    "가공육"
+                        ]
+            },
+            {
+                        "name": "고지혈증",
+                        "category": "순환기",
+                        "behaviors": [
+                                    "주 3회 이상 유산소 운동"
+                        ],
+                        "goodFoods": [
+                                    "등푸른 생선",
+                                    "귀리",
+                                    "올리브유"
+                        ],
+                        "badFoods": [
+                                    "삼겹살",
+                                    "버터",
+                                    "트랜스지방"
+                        ]
+            },
+            {
+                        "name": "협심증",
+                        "category": "순환기",
+                        "behaviors": [
+                                    "금연",
+                                    "갑작스러운 추위 노출 피하기"
+                        ],
+                        "goodFoods": [
+                                    "견과류",
+                                    "토마토",
+                                    "등푸른 생선"
+                        ],
+                        "badFoods": [
+                                    "고지방 육류",
+                                    "짠 음식",
+                                    "술"
+                        ]
+            },
+            {
+                        "name": "심근경색",
+                        "category": "순환기",
+                        "behaviors": [
+                                    "응급증상(가슴통증) 숙지",
+                                    "체중 관리"
+                        ],
+                        "goodFoods": [
+                                    "등푸른 생선",
+                                    "채소류",
+                                    "해조류"
+                        ],
+                        "badFoods": [
+                                    "인스턴트",
+                                    "가공육",
+                                    "알코올"
+                        ]
+            },
+            {
+                        "name": "동맥경화증",
+                        "category": "순환기",
+                        "behaviors": [
+                                    "매일 30분 산책",
+                                    "유산소 운동"
+                        ],
+                        "goodFoods": [
+                                    "마늘",
+                                    "양파",
+                                    "콩류"
+                        ],
+                        "badFoods": [
+                                    "내장류",
+                                    "계란 노른자 과다",
+                                    "튀김"
+                        ]
+            },
+            {
+                        "name": "심부전",
+                        "category": "순환기",
+                        "behaviors": [
+                                    "매일 체중 측정(부종 확인)",
+                                    "염분 제한"
+                        ],
+                        "goodFoods": [
+                                    "단백질 적정 섭취",
+                                    "식이섬유"
+                        ],
+                        "badFoods": [
+                                    "나트륨 과다 식품",
+                                    "과도한 수분"
+                        ]
+            },
+            {
+                        "name": "부정맥",
+                        "category": "순환기",
+                        "behaviors": [
+                                    "카페인 및 알코올 섭취 제한"
+                        ],
+                        "goodFoods": [
+                                    "마그네슘(바나나",
+                                    "견과류)"
+                        ],
+                        "badFoods": [
+                                    "에너지음료",
+                                    "커피",
+                                    "술"
+                        ]
+            },
+            {
+                        "name": "저혈압",
+                        "category": "순환기",
+                        "behaviors": [
+                                    "급하게 일어나지 않기",
+                                    "수분 섭취"
+                        ],
+                        "goodFoods": [
+                                    "적정 염분",
+                                    "미역국"
+                        ],
+                        "badFoods": [
+                                    "과도한 다이어트식",
+                                    "술"
+                        ]
+            },
+            {
+                        "name": "말초동맥질환",
+                        "category": "순환기",
+                        "behaviors": [
+                                    "금연",
+                                    "발 관리 및 조깅"
+                        ],
+                        "goodFoods": [
+                                    "불포화지방산",
+                                    "채소"
+                        ],
+                        "badFoods": [
+                                    "포화지방",
+                                    "정제당"
+                        ]
+            },
+            {
+                        "name": "하지정맥류",
+                        "category": "순환기",
+                        "behaviors": [
+                                    "오래 서 있지 않기",
+                                    "다리 올리기"
+                        ],
+                        "goodFoods": [
+                                    "루틴 함유 식품(메밀",
+                                    "베리류)"
+                        ],
+                        "badFoods": [
+                                    "짠 음식(부종 유발)",
+                                    "튀김"
+                        ]
+            },
+            {
+                        "name": "당뇨병",
+                        "category": "내분비 / 대사 질환",
+                        "behaviors": [
+                                    "식후 30분 운동",
+                                    "규칙적 복약"
+                        ],
+                        "goodFoods": [
+                                    "현미",
+                                    "두부",
+                                    "여주"
+                        ],
+                        "badFoods": [
+                                    "설탕",
+                                    "음료수",
+                                    "떡",
+                                    "빵"
+                        ]
+            },
+            {
+                        "name": "통풍",
+                        "category": "내분비 / 대사 질환",
+                        "behaviors": [
+                                    "수분 충분히 섭취",
+                                    "체중 감량"
+                        ],
+                        "goodFoods": [
+                                    "체리",
+                                    "우유",
+                                    "채소류"
+                        ],
+                        "badFoods": [
+                                    "맥주",
+                                    "붉은 고기",
+                                    "조개류"
+                        ]
+            },
+            {
+                        "name": "갑상선기능항진증",
+                        "category": "내분비 / 대사 질환",
+                        "behaviors": [
+                                    "충분한 휴식",
+                                    "체온 조절"
+                        ],
+                        "goodFoods": [
+                                    "고단백·고칼로리 식품"
+                        ],
+                        "badFoods": [
+                                    "카페인",
+                                    "극심한 매운 음식"
+                        ]
+            },
+            {
+                        "name": "갑상선기능저하증",
+                        "category": "내분비 / 대사 질환",
+                        "behaviors": [
+                                    "체중 관리",
+                                    "적절한 유산소 운동"
+                        ],
+                        "goodFoods": [
+                                    "해조류(적정량)",
+                                    "채소"
+                        ],
+                        "badFoods": [
+                                    "과도한 콩류(방해 가능시)"
+                        ]
+            },
+            {
+                        "name": "비만",
+                        "category": "내분비 / 대사 질환",
+                        "behaviors": [
+                                    "식사 일기 작성",
+                                    "매일 유산소"
+                        ],
+                        "goodFoods": [
+                                    "식이섬유",
+                                    "살코기",
+                                    "닭가슴살"
+                        ],
+                        "badFoods": [
+                                    "패스트푸드",
+                                    "탄산음료"
+                        ]
+            },
+            {
+                        "name": "대사증후군",
+                        "category": "내분비 / 대사 질환",
+                        "behaviors": [
+                                    "허리둘레 관리",
+                                    "규칙적 운동"
+                        ],
+                        "goodFoods": [
+                                    "통곡물",
+                                    "등푸른 생선"
+                        ],
+                        "badFoods": [
+                                    "과당",
+                                    "정제 당류",
+                                    "야식"
+                        ]
+            },
+            {
+                        "name": "골다공증",
+                        "category": "내분비 / 대사 질환",
+                        "behaviors": [
+                                    "뼈 비틀기 피하기",
+                                    "야외 햇빛 쬐기"
+                        ],
+                        "goodFoods": [
+                                    "칼슘(우유",
+                                    "멸치)",
+                                    "비타민 D"
+                        ],
+                        "badFoods": [
+                                    "탄산음료",
+                                    "커피",
+                                    "짠 음식"
+                        ]
+            },
+            {
+                        "name": "질소혈증/구풍증",
+                        "category": "내분비 / 대사 질환",
+                        "behaviors": [
+                                    "수분 섭취",
+                                    "과도한 영양제 금지"
+                        ],
+                        "goodFoods": [
+                                    "적정 체액 유지용 음식"
+                        ],
+                        "badFoods": [
+                                    "고단백식(의사상담 필요)"
+                        ]
+            },
+            {
+                        "name": "비알코올성 지방간",
+                        "category": "내분비 / 대사 질환",
+                        "behaviors": [
+                                    "금주",
+                                    "체중 10% 감량"
+                        ],
+                        "goodFoods": [
+                                    "항산화 채소",
+                                    "두부"
+                        ],
+                        "badFoods": [
+                                    "탄수화물 과다",
+                                    "과당"
+                        ]
+            },
+            {
+                        "name": "쿠싱증후군",
+                        "category": "내분비 / 대사 질환",
+                        "behaviors": [
+                                    "감염 예방",
+                                    "뼈 건강 유의"
+                        ],
+                        "goodFoods": [
+                                    "고단백",
+                                    "저나트륨 식품"
+                        ],
+                        "badFoods": [
+                                    "짠 음식",
+                                    "정제 설탕"
+                        ]
+            },
+            {
+                        "name": "역류성 식도염",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "식후 3시간 눕기 금지"
+                        ],
+                        "goodFoods": [
+                                    "양배추",
+                                    "마",
+                                    "바나나"
+                        ],
+                        "badFoods": [
+                                    "커피",
+                                    "초콜릿",
+                                    "탄산",
+                                    "매운 음식"
+                        ]
+            },
+            {
+                        "name": "위염",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "규칙적인 식사",
+                                    "스트레스 관리"
+                        ],
+                        "goodFoods": [
+                                    "브로콜리",
+                                    "감자"
+                        ],
+                        "badFoods": [
+                                    "짜고 매운 음식",
+                                    "술",
+                                    "튀김"
+                        ]
+            },
+            {
+                        "name": "위궤양",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "금연",
+                                    "짠 음식 피하기"
+                        ],
+                        "goodFoods": [
+                                    "양배추",
+                                    "감자즙"
+                        ],
+                        "badFoods": [
+                                    "강한 조미료",
+                                    "카페인"
+                        ]
+            },
+            {
+                        "name": "십이지장궤양",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "공복감 피하기",
+                                    "속 쓰릴 때 보충"
+                        ],
+                        "goodFoods": [
+                                    "호박",
+                                    "부드러운 살코기"
+                        ],
+                        "badFoods": [
+                                    "야식",
+                                    "찬 음식",
+                                    "술"
+                        ]
+            },
+            {
+                        "name": "과민성대장증후군",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "저FODMAP 식단",
+                                    "스트레스 관리"
+                        ],
+                        "goodFoods": [
+                                    "쌀밥",
+                                    "바나나",
+                                    "감자"
+                        ],
+                        "badFoods": [
+                                    "우유(라토오스)",
+                                    "밀가루",
+                                    "콩류"
+                        ]
+            },
+            {
+                        "name": "만성 변비",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "배변 시 무리한 힘 금지",
+                                    "유산소"
+                        ],
+                        "goodFoods": [
+                                    "사과",
+                                    "미역",
+                                    "쾌변요거트"
+                        ],
+                        "badFoods": [
+                                    "가공식품",
+                                    "감(감의 탄닌)"
+                        ]
+            },
+            {
+                        "name": "만성 설사",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "수분/전해질 보충"
+                        ],
+                        "goodFoods": [
+                                    "미음",
+                                    "바나나",
+                                    "익힌 당근"
+                        ],
+                        "badFoods": [
+                                    "기름진 음식",
+                                    "유제품",
+                                    "찬 음료"
+                        ]
+            },
+            {
+                        "name": "지방간",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "운동",
+                                    "절주"
+                        ],
+                        "goodFoods": [
+                                    "비타민 B군 풍부 식품"
+                        ],
+                        "badFoods": [
+                                    "알코올",
+                                    "액상과당"
+                        ]
+            },
+            {
+                        "name": "간경화",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "절대 금주",
+                                    "소금 제한"
+                        ],
+                        "goodFoods": [
+                                    "삶은 계란",
+                                    "부드러운 단백질"
+                        ],
+                        "badFoods": [
+                                    "생선회(익히지 않은 해산물)"
+                        ]
+            },
+            {
+                        "name": "담석증",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "급격한 다이어트 피하기"
+                        ],
+                        "goodFoods": [
+                                    "식이섬유",
+                                    "맑은 국"
+                        ],
+                        "badFoods": [
+                                    "고지방 음식",
+                                    "튀김"
+                        ]
+            },
+            {
+                        "name": "췌장염",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "금주",
+                                    "절대 금연"
+                        ],
+                        "goodFoods": [
+                                    "저지방 식단",
+                                    "쌀죽"
+                        ],
+                        "badFoods": [
+                                    "알코올",
+                                    "기름진 고기"
+                        ]
+            },
+            {
+                        "name": "궤양성 대장염",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "식사 일기 써서 자극원 찾기"
+                        ],
+                        "goodFoods": [
+                                    "잘 익힌 채소",
+                                    "살코기"
+                        ],
+                        "badFoods": [
+                                    "날음식",
+                                    "팝콘",
+                                    "씨앗류"
+                        ]
+            },
+            {
+                        "name": "크론병",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "흡연 엄금",
+                                    "수분 보충"
+                        ],
+                        "goodFoods": [
+                                    "부드러운 죽",
+                                    "익힌 생선"
+                        ],
+                        "badFoods": [
+                                    "가공육",
+                                    "유제품",
+                                    "매운 양념"
+                        ]
+            },
+            {
+                        "name": "만성 치질",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "좌욕하기",
+                                    "배변 시간 5분 이내"
+                        ],
+                        "goodFoods": [
+                                    "식이섬유",
+                                    "수분"
+                        ],
+                        "badFoods": [
+                                    "술",
+                                    "자극적인 캡사이신"
+                        ]
+            },
+            {
+                        "name": "위경련",
+                        "category": "소화기 / 간담도 질환",
+                        "behaviors": [
+                                    "배 따뜻하게 유지하기"
+                        ],
+                        "goodFoods": [
+                                    "따뜻한 물",
+                                    "숭늉"
+                        ],
+                        "badFoods": [
+                                    "찬물",
+                                    "커피",
+                                    "직화구이"
+                        ]
+            },
+            {
+                        "name": "천식",
+                        "category": "호흡기 질환",
+                        "behaviors": [
+                                    "찬 공기 갑자기 쐬지 않기",
+                                    "환기"
+                        ],
+                        "goodFoods": [
+                                    "도라지",
+                                    "배",
+                                    "오미자"
+                        ],
+                        "badFoods": [
+                                    "찬 음료",
+                                    "아황산염 함유 건과일"
+                        ]
+            },
+            {
+                        "name": "만성폐쇄성폐질환(COPD)",
+                        "category": "호흡기 질환",
+                        "behaviors": [
+                                    "금연",
+                                    "호흡 운동"
+                        ],
+                        "goodFoods": [
+                                    "고단백 영양식",
+                                    "물"
+                        ],
+                        "badFoods": [
+                                    "유제품(가래 유발 시)"
+                        ]
+            },
+            {
+                        "name": "폐렴",
+                        "category": "호흡기 질환",
+                        "behaviors": [
+                                    "충분한 수면",
+                                    "실내 습도 50% 유지"
+                        ],
+                        "goodFoods": [
+                                    "수분",
+                                    "따뜻한 꿀물"
+                        ],
+                        "badFoods": [
+                                    "차가운 음식",
+                                    "튀김"
+                        ]
+            },
+            {
+                        "name": "기관지염",
+                        "category": "호흡기 질환",
+                        "behaviors": [
+                                    "마스크 착용",
+                                    "미지근한 물 자주 마시기"
+                        ],
+                        "goodFoods": [
+                                    "생강",
+                                    "배",
+                                    "모과"
+                        ],
+                        "badFoods": [
+                                    "튀김",
+                                    "부침개(기름진 음식)"
+                        ]
+            },
+            {
+                        "name": "비염 (알레르기성)",
+                        "category": "호흡기 질환",
+                        "behaviors": [
+                                    "침구류 자주 세탁",
+                                    "집진드기 제거"
+                        ],
+                        "goodFoods": [
+                                    "연근",
+                                    "미나리",
+                                    "차"
+                        ],
+                        "badFoods": [
+                                    "인공지능 첨가물",
+                                    "찬 음료"
+                        ]
+            },
+            {
+                        "name": "부비동염(축농증)",
+                        "category": "호흡기 질환",
+                        "behaviors": [
+                                    "코 세척",
+                                    "온습도 조절"
+                        ],
+                        "goodFoods": [
+                                    "수분 충분히",
+                                    "대추차"
+                        ],
+                        "badFoods": [
+                                    "자극적인 매운 양념"
+                        ]
+            },
+            {
+                        "name": "폐결핵",
+                        "category": "호흡기 질환",
+                        "behaviors": [
+                                    "처방약 끊지 않고 완복하기"
+                        ],
+                        "goodFoods": [
+                                    "고단백(고기",
+                                    "계란)",
+                                    "비타민"
+                        ],
+                        "badFoods": [
+                                    "알코올",
+                                    "카페인"
+                        ]
+            },
+            {
+                        "name": "폐섬유증",
+                        "category": "호흡기 질환",
+                        "behaviors": [
+                                    "산소 치료 준수",
+                                    "미세먼지 차단"
+                        ],
+                        "goodFoods": [
+                                    "항산화 물질(토마토",
+                                    "베리)"
+                        ],
+                        "badFoods": [
+                                    "짠 음식(부종 유발)"
+                        ]
+            },
+            {
+                        "name": "수면무호흡증",
+                        "category": "호흡기 질환",
+                        "behaviors": [
+                                    "옆으로 누워 자기",
+                                    "체중 감량"
+                        ],
+                        "goodFoods": [
+                                    "체중 감량용 식이"
+                        ],
+                        "badFoods": [
+                                    "야식",
+                                    "취침 전 음주"
+                        ]
+            },
+            {
+                        "name": "후두염",
+                        "category": "호흡기 질환",
+                        "behaviors": [
+                                    "목소리 쉬어주기",
+                                    "수분 섭취"
+                        ],
+                        "goodFoods": [
+                                    "따뜻한 모과차",
+                                    "유자차"
+                        ],
+                        "badFoods": [
+                                    "자극적인 탄산",
+                                    "찬 음료"
+                        ]
+            },
+            {
+                        "name": "만성 콩팥병",
+                        "category": "신장 / 비뇨기 질환",
+                        "behaviors": [
+                                    "약물 오남용 금지",
+                                    "체중 모니터링"
+                        ],
+                        "goodFoods": [
+                                    "흰쌀밥",
+                                    "껍질 깐 사과"
+                        ],
+                        "badFoods": [
+                                    "잡곡밥",
+                                    "바나나(고칼륨 주의)"
+                        ]
+            },
+            {
+                        "name": "신우신염",
+                        "category": "신장 / 비뇨기 질환",
+                        "behaviors": [
+                                    "배뇨 참지 않기",
+                                    "수분 섭취"
+                        ],
+                        "goodFoods": [
+                                    "크랜베리",
+                                    "수분 충분히"
+                        ],
+                        "badFoods": [
+                                    "자극적인 미원/향신료"
+                        ]
+            },
+            {
+                        "name": "요로결석",
+                        "category": "신장 / 비뇨기 질환",
+                        "behaviors": [
+                                    "하루 2L 이상 물 마시기"
+                        ],
+                        "goodFoods": [
+                                    "레몬(시트르산)",
+                                    "줄기채소"
+                        ],
+                        "badFoods": [
+                                    "시금치",
+                                    "초콜릿",
+                                    "짠 음식"
+                        ]
+            },
+            {
+                        "name": "방광염",
+                        "category": "신장 / 비뇨기 질환",
+                        "behaviors": [
+                                    "소변 오래 참지 않기",
+                                    "청결 유의"
+                        ],
+                        "goodFoods": [
+                                    "물",
+                                    "크랜베리 주스"
+                        ],
+                        "badFoods": [
+                                    "커피",
+                                    "알코올",
+                                    "캡사이신"
+                        ]
+            },
+            {
+                        "name": "전립선비대증",
+                        "category": "신장 / 비뇨기 질환",
+                        "behaviors": [
+                                    "체온 유지",
+                                    "오래 앉아있지 않기"
+                        ],
+                        "goodFoods": [
+                                    "토마토(라이코펜)",
+                                    "마늘"
+                        ],
+                        "badFoods": [
+                                    "야간 대량 수분",
+                                    "음주"
+                        ]
+            },
+            {
+                        "name": "전립선염",
+                        "category": "신장 / 비뇨기 질환",
+                        "behaviors": [
+                                    "회음부 압박 금지(자전거 주의)"
+                        ],
+                        "goodFoods": [
+                                    "호박씨",
+                                    "토마토"
+                        ],
+                        "badFoods": [
+                                    "자극적인 음식",
+                                    "술"
+                        ]
+            },
+            {
+                        "name": "신증후군",
+                        "category": "신장 / 비뇨기 질환",
+                        "behaviors": [
+                                    "소금 섭취 엄격 제한"
+                        ],
+                        "goodFoods": [
+                                    "적정 단백질",
+                                    "저염식"
+                        ],
+                        "badFoods": [
+                                    "나트륨 함유 가공식품"
+                        ]
+            },
+            {
+                        "name": "과활동성 방광",
+                        "category": "신장 / 비뇨기 질환",
+                        "behaviors": [
+                                    "골반저근 운동(케겔)",
+                                    "배뇨 훈련"
+                        ],
+                        "goodFoods": [
+                                    "수분 적정 섭취"
+                        ],
+                        "badFoods": [
+                                    "카페인",
+                                    "인공감미료"
+                        ]
+            },
+            {
+                        "name": "요실금",
+                        "category": "신장 / 비뇨기 질환",
+                        "behaviors": [
+                                    "체중 조절",
+                                    "체력에 맞는 운동"
+                        ],
+                        "goodFoods": [
+                                    "식이섬유",
+                                    "균형 잡힌 식단"
+                        ],
+                        "badFoods": [
+                                    "커피",
+                                    "술",
+                                    "매운 음식"
+                        ]
+            },
+            {
+                        "name": "신장암",
+                        "category": "신장 / 비뇨기 질환",
+                        "behaviors": [
+                                    "금연",
+                                    "주기적 초음파 검사"
+                        ],
+                        "goodFoods": [
+                                    "신선한 채소",
+                                    "수분"
+                        ],
+                        "badFoods": [
+                                    "가공육",
+                                    "탄 고기"
+                        ]
+            },
+            {
+                        "name": "뇌졸중 (뇌경색/뇌출혈)",
+                        "category": "뇌신경 / 정신건강 질환",
+                        "behaviors": [
+                                    "혈압/혈당 모니터링",
+                                    "금연"
+                        ],
+                        "goodFoods": [
+                                    "등푸른 생선",
+                                    "채소"
+                        ],
+                        "badFoods": [
+                                    "염분",
+                                    "포화지방"
+                        ]
+            },
+            {
+                        "name": "치매 (알츠하이머)",
+                        "category": "뇌신경 / 정신건강 질환",
+                        "behaviors": [
+                                    "두뇌 활동(독서",
+                                    "퀴즈)",
+                                    "운동"
+                        ],
+                        "goodFoods": [
+                                    "블루베리",
+                                    "견과류",
+                                    "카레"
+                        ],
+                        "badFoods": [
+                                    "정제당",
+                                    "튀긴 음식"
+                        ]
+            },
+            {
+                        "name": "파킨슨병",
+                        "category": "뇌신경 / 정신건강 질환",
+                        "behaviors": [
+                                    "균형 잡기 운동",
+                                    "낙상 주의"
+                        ],
+                        "goodFoods": [
+                                    "식이섬유(변비 예방)"
+                        ],
+                        "badFoods": [
+                                    "고단백식(약 복용 시 시간 조절)"
+                        ]
+            },
+            {
+                        "name": "편두통",
+                        "category": "뇌신경 / 정신건강 질환",
+                        "behaviors": [
+                                    "수면 패턴 일정 유지"
+                        ],
+                        "goodFoods": [
+                                    "마그네슘(바나나",
+                                    "시금치)"
+                        ],
+                        "badFoods": [
+                                    "치즈",
+                                    "와인",
+                                    "초콜릿",
+                                    "MSG"
+                        ]
+            },
+            {
+                        "name": "우울증",
+                        "category": "뇌신경 / 정신건강 질환",
+                        "behaviors": [
+                                    "규칙적인 야외 햇빛 쬐기",
+                                    "산책"
+                        ],
+                        "goodFoods": [
+                                    "오메가-3",
+                                    "계란",
+                                    "바나나"
+                        ],
+                        "badFoods": [
+                                    "알코올",
+                                    "정제 설탕"
+                        ]
+            },
+            {
+                        "name": "불면증",
+                        "category": "뇌신경 / 정신건강 질환",
+                        "behaviors": [
+                                    "취침 전 스마트폰 금지"
+                        ],
+                        "goodFoods": [
+                                    "따뜻한 우유",
+                                    "체리",
+                                    "바나나"
+                        ],
+                        "badFoods": [
+                                    "취침 전 커피",
+                                    "술"
+                        ]
+            },
+            {
+                        "name": "공황장애",
+                        "category": "뇌신경 / 정신건강 질환",
+                        "behaviors": [
+                                    "복식 호흡",
+                                    "스트레스 관리"
+                        ],
+                        "goodFoods": [
+                                    "호두",
+                                    "블루베리",
+                                    "허브티"
+                        ],
+                        "badFoods": [
+                                    "카페인(커피",
+                                    "에너지음료)"
+                        ]
+            },
+            {
+                        "name": "조현병",
+                        "category": "뇌신경 / 정신건강 질환",
+                        "behaviors": [
+                                    "처방약 일탈 없이 복용"
+                        ],
+                        "goodFoods": [
+                                    "균형 잡힌 탄수화물/단백질"
+                        ],
+                        "badFoods": [
+                                    "술",
+                                    "뇌 자극제"
+                        ]
+            },
+            {
+                        "name": "불안장애",
+                        "category": "뇌신경 / 정신건강 질환",
+                        "behaviors": [
+                                    "유산소 운동",
+                                    "명상"
+                        ],
+                        "goodFoods": [
+                                    "카모마일 차",
+                                    "견과류"
+                        ],
+                        "badFoods": [
+                                    "카페인",
+                                    "고혈당 간식"
+                        ]
+            },
+            {
+                        "name": "안면신경마비 (구안와사)",
+                        "category": "뇌신경 / 정신건강 질환",
+                        "behaviors": [
+                                    "얼굴 따뜻하게 하기",
+                                    "마사지"
+                        ],
+                        "goodFoods": [
+                                    "비타민 B군",
+                                    "따뜻한 음식"
+                        ],
+                        "badFoods": [
+                                    "찬 음식",
+                                    "술"
+                        ]
+            },
+            {
+                        "name": "양극성장애 (조울증)",
+                        "category": "뇌신경 / 정신건강 질환",
+                        "behaviors": [
+                                    "수면 생체리듬 사수"
+                        ],
+                        "goodFoods": [
+                                    "오메가-3",
+                                    "단백질"
+                        ],
+                        "badFoods": [
+                                    "정제당",
+                                    "카페인"
+                        ]
+            },
+            {
+                        "name": "성인 ADHD",
+                        "category": "뇌신경 / 정신건강 질환",
+                        "behaviors": [
+                                    "시각적 플래너 작성",
+                                    "메모하기"
+                        ],
+                        "goodFoods": [
+                                    "단백질 식품",
+                                    "등푸른 생선"
+                        ],
+                        "badFoods": [
+                                    "인공색소",
+                                    "가공당"
+                        ]
+            },
+            {
+                        "name": "손목터널증후군",
+                        "category": "뇌신경 / 정신건강 질환",
+                        "behaviors": [
+                                    "스트레칭",
+                                    "수목 보호대 착용"
+                        ],
+                        "goodFoods": [
+                                    "항염 식품(생강",
+                                    "강황)"
+                        ],
+                        "badFoods": [
+                                    "짠 음식(부종 유발)"
+                        ]
+            },
+            {
+                        "name": "퇴행성 관절염",
+                        "category": "근골격계 / 관절 질환",
+                        "behaviors": [
+                                    "체중 감량",
+                                    "수영/바이크 운동"
+                        ],
+                        "goodFoods": [
+                                    "고등어",
+                                    "브로콜리"
+                        ],
+                        "badFoods": [
+                                    "튀김",
+                                    "짠 음식"
+                        ]
+            },
+            {
+                        "name": "류마티스 관절염",
+                        "category": "근골격계 / 관절 질환",
+                        "behaviors": [
+                                    "관절 과도 사용 피하기",
+                                    "찜질"
+                        ],
+                        "goodFoods": [
+                                    "연어",
+                                    "올리브유",
+                                    "베리류"
+                        ],
+                        "badFoods": [
+                                    "트랜스지방",
+                                    "가공육"
+                        ]
+            },
+            {
+                        "name": "허리디스크 (추간판탈출증)",
+                        "category": "근골격계 / 관절 질환",
+                        "behaviors": [
+                                    "올바른 자세",
+                                    "허리 강화 운동"
+                        ],
+                        "goodFoods": [
+                                    "칼슘",
+                                    "비타민 D"
+                        ],
+                        "badFoods": [
+                                    "술(디스크 수분 빼앗음)"
+                        ]
+            },
+            {
+                        "name": "목디스크",
+                        "category": "근골격계 / 관절 질환",
+                        "behaviors": [
+                                    "스마트폰 높이 들기",
+                                    "스트레칭"
+                        ],
+                        "goodFoods": [
+                                    "항염 식품",
+                                    "칼슘"
+                        ],
+                        "badFoods": [
+                                    "야식",
+                                    "포화지방"
+                        ]
+            },
+            {
+                        "name": "오십견 (유착성 관절낭염)",
+                        "category": "근골격계 / 관절 질환",
+                        "behaviors": [
+                                    "부드러운 범위 내 스트레칭"
+                        ],
+                        "goodFoods": [
+                                    "콩류",
+                                    "생선"
+                        ],
+                        "badFoods": [
+                                    "짠 음식",
+                                    "과도한 설탕"
+                        ]
+            },
+            {
+                        "name": "오목가슴/척추측만증",
+                        "category": "근골격계 / 관절 질환",
+                        "behaviors": [
+                                    "코어 근육 강화",
+                                    "정기 검진"
+                        ],
+                        "goodFoods": [
+                                    "뼈 건강 영양소"
+                        ],
+                        "badFoods": [
+                                    "극단적 단식"
+                        ]
+            },
+            {
+                        "name": "족저근막염",
+                        "category": "근골격계 / 관절 질환",
+                        "behaviors": [
+                                    "아킬레스건 스트레칭",
+                                    "쿠션화"
+                        ],
+                        "goodFoods": [
+                                    "체중 조절용 건강식"
+                        ],
+                        "badFoods": [
+                                    "짠 음식",
+                                    "튀김"
+                        ]
+            },
+            {
+                        "name": "근막통증증후군",
+                        "category": "근골격계 / 관절 질환",
+                        "behaviors": [
+                                    "자세 바꾸기",
+                                    "온열 찜질"
+                        ],
+                        "goodFoods": [
+                                    "수분",
+                                    "마그네슘 식품"
+                        ],
+                        "badFoods": [
+                                    "카페인",
+                                    "술"
+                        ]
+            },
+            {
+                        "name": "섬유근육통",
+                        "category": "근골격계 / 관절 질환",
+                        "behaviors": [
+                                    "가벼운 유산소",
+                                    "수면 관리"
+                        ],
+                        "goodFoods": [
+                                    "신선한 과일",
+                                    "채소"
+                        ],
+                        "badFoods": [
+                                    "인공감미료",
+                                    "튀긴 음식"
+                        ]
+            },
+            {
+                        "name": "골관절염",
+                        "category": "근골격계 / 관절 질환",
+                        "behaviors": [
+                                    "무릎 꿇기 금지",
+                                    "근력 운동"
+                        ],
+                        "goodFoods": [
+                                    "항산화 베리류",
+                                    "생선"
+                        ],
+                        "badFoods": [
+                                    "고지방 패스트푸드"
+                        ]
+            },
+            {
+                        "name": "아토피 피부염",
+                        "category": "피부 / 알레르기 / 감염 질환",
+                        "behaviors": [
+                                    "미지근한 물 보습",
+                                    "미세먼지 차단"
+                        ],
+                        "goodFoods": [
+                                    "아연(굴",
+                                    "콩)",
+                                    "채소"
+                        ],
+                        "badFoods": [
+                                    "인공첨가물",
+                                    "튀김",
+                                    "밀가루"
+                        ]
+            },
+            {
+                        "name": "건선",
+                        "category": "피부 / 알레르기 / 감염 질환",
+                        "behaviors": [
+                                    "피부 건조 방지",
+                                    "햇빛 쬐기"
+                        ],
+                        "goodFoods": [
+                                    "항산화 식품",
+                                    "생선"
+                        ],
+                        "badFoods": [
+                                    "술",
+                                    "붉은 고기"
+                        ]
+            },
+            {
+                        "name": "여드름",
+                        "category": "피부 / 알레르기 / 감염 질환",
+                        "behaviors": [
+                                    "짚은 세안 금지",
+                                    "손대지 않기"
+                        ],
+                        "goodFoods": [
+                                    "물",
+                                    "그린 푸드"
+                        ],
+                        "badFoods": [
+                                    "당지수 높은 음식",
+                                    "우유"
+                        ]
+            },
+            {
+                        "name": "지루성 피부염",
+                        "category": "피부 / 알레르기 / 감염 질환",
+                        "behaviors": [
+                                    "머리 잘 말리기",
+                                    "스트레스 줄이기"
+                        ],
+                        "goodFoods": [
+                                    "비타민 B군 식품"
+                        ],
+                        "badFoods": [
+                                    "기름진 야식",
+                                    "술"
+                        ]
+            },
+            {
+                        "name": "두드러기",
+                        "category": "피부 / 알레르기 / 감염 질환",
+                        "behaviors": [
+                                    "긁지 않기",
+                                    "시원한 찜질"
+                        ],
+                        "goodFoods": [
+                                    "유기농 채소",
+                                    "수분"
+                        ],
+                        "badFoods": [
+                                    "히스타민 풍부 식품(돼지고기",
+                                    "서양자두)"
+                        ]
+            },
+            {
+                        "name": "대상포진",
+                        "category": "피부 / 알레르기 / 감염 질환",
+                        "behaviors": [
+                                    "면역력 유지",
+                                    "충분한 휴식"
+                        ],
+                        "goodFoods": [
+                                    "고단백식",
+                                    "비타민 C"
+                        ],
+                        "badFoods": [
+                                    "술",
+                                    "인스턴트"
+                        ]
+            },
+            {
+                        "name": "무좀 (백선)",
+                        "category": "피부 / 알레르기 / 감염 질환",
+                        "behaviors": [
+                                    "발 발가락 사이 잘 건조하기"
+                        ],
+                        "goodFoods": [
+                                    "면역 강화 식품"
+                        ],
+                        "badFoods": [
+                                    "자극적 조미료"
+                        ]
+            },
+            {
+                        "name": "탈모 (남성형/원형)",
+                        "category": "피부 / 알레르기 / 감염 질환",
+                        "behaviors": [
+                                    "두피 청결",
+                                    "야간 충분한 수면"
+                        ],
+                        "goodFoods": [
+                                    "콩",
+                                    "흑미",
+                                    "계란 노른자"
+                        ],
+                        "badFoods": [
+                                    "기름진 음식",
+                                    "음주"
+                        ]
+            },
+            {
+                        "name": "수족구병",
+                        "category": "피부 / 알레르기 / 감염 질환",
+                        "behaviors": [
+                                    "손 씻기",
+                                    "기구 소독"
+                        ],
+                        "goodFoods": [
+                                    "부드럽고 찬 죽/아이스크림"
+                        ],
+                        "badFoods": [
+                                    "핫소스",
+                                    "시고 매운 음식"
+                        ]
+            },
+            {
+                        "name": "독감 (인플루엔자)",
+                        "category": "피부 / 알레르기 / 감염 질환",
+                        "behaviors": [
+                                    "예방접종",
+                                    "마스크 착용"
+                        ],
+                        "goodFoods": [
+                                    "미지근한 물",
+                                    "꿀물"
+                        ],
+                        "badFoods": [
+                                    "기름진 튀김",
+                                    "음주"
+                        ]
+            },
+            {
+                        "name": "수두",
+                        "category": "피부 / 알레르기 / 감염 질환",
+                        "behaviors": [
+                                    "손톱 짧게 깎기",
+                                    "긁기 방지"
+                        ],
+                        "goodFoods": [
+                                    "미음",
+                                    "보리차"
+                        ],
+                        "badFoods": [
+                                    "딱딱하고 자극적인 음식"
+                        ]
+            },
+            {
+                        "name": "백내장",
+                        "category": "안과 / 이비인후과 / 기타 질환",
+                        "behaviors": [
+                                    "자외선 차단 선글라스 착용"
+                        ],
+                        "goodFoods": [
+                                    "루테인(시금치",
+                                    "계란)"
+                        ],
+                        "badFoods": [
+                                    "정제 설탕",
+                                    "트랜스지방"
+                        ]
+            },
+            {
+                        "name": "녹내장",
+                        "category": "안과 / 이비인후과 / 기타 질환",
+                        "behaviors": [
+                                    "안압 높이는 동작(엎드리기) 피하기"
+                        ],
+                        "goodFoods": [
+                                    "자색 고구마",
+                                    "블루베리"
+                        ],
+                        "badFoods": [
+                                    "대량의 수분 한 번에 마시기",
+                                    "커피"
+                        ]
+            },
+            {
+                        "name": "안구건조증",
+                        "category": "안과 / 이비인후과 / 기타 질환",
+                        "behaviors": [
+                                    "화면 볼 때 눈 자주 깜빡이기"
+                        ],
+                        "goodFoods": [
+                                    "비타민 A(당근",
+                                    "단호박)"
+                        ],
+                        "badFoods": [
+                                    "카페인",
+                                    "건조한 음식"
+                        ]
+            },
+            {
+                        "name": "황반변성",
+                        "category": "안과 / 이비인후과 / 기타 질환",
+                        "behaviors": [
+                                    "금연",
+                                    "자외선 차단"
+                        ],
+                        "goodFoods": [
+                                    "루테인·지아잔틴 식품"
+                        ],
+                        "badFoods": [
+                                    "포화지방",
+                                    "튀김"
+                        ]
+            },
+            {
+                        "name": "이명",
+                        "category": "안과 / 이비인후과 / 기타 질환",
+                        "behaviors": [
+                                    "큰 소리 노출 피하기"
+                        ],
+                        "goodFoods": [
+                                    "아연(견과류)",
+                                    "마그네슘"
+                        ],
+                        "badFoods": [
+                                    "짜게 먹기",
+                                    "카페인"
+                        ]
+            },
+            {
+                        "name": "메니에르병",
+                        "category": "안과 / 이비인후과 / 기타 질환",
+                        "behaviors": [
+                                    "저염식 유지",
+                                    "스트레스 관리"
+                        ],
+                        "goodFoods": [
+                                    "저염 식단",
+                                    "수분 적정"
+                        ],
+                        "badFoods": [
+                                    "나트륨",
+                                    "술",
+                                    "커피"
+                        ]
+            },
+            {
+                        "name": "중이염",
+                        "category": "안과 / 이비인후과 / 기타 질환",
+                        "behaviors": [
+                                    "코 세게 뚫지 않기"
+                        ],
+                        "goodFoods": [
+                                    "비타민 C 식품"
+                        ],
+                        "badFoods": [
+                                    "찬 음료",
+                                    "유제품"
+                        ]
+            },
+            {
+                        "name": "구내염",
+                        "category": "안과 / 이비인후과 / 기타 질환",
+                        "behaviors": [
+                                    "입안 청결",
+                                    "수면 부족 개선"
+                        ],
+                        "goodFoods": [
+                                    "비타민 B/C",
+                                    "연두부"
+                        ],
+                        "badFoods": [
+                                    "시거나 매운 자극적 음식"
+                        ]
+            },
+            {
+                        "name": "빈혈 (철결핍성)",
+                        "category": "안과 / 이비인후과 / 기타 질환",
+                        "behaviors": [
+                                    "철분제 섭취",
+                                    "규칙적 식사"
+                        ],
+                        "goodFoods": [
+                                    "붉은 살코기",
+                                    "깻잎"
+                        ],
+                        "badFoods": [
+                                    "홍차",
+                                    "녹차(철분 흡수 방해)"
+                        ]
+            },
+            {
+                        "name": "만성 피로 증후군",
+                        "category": "안과 / 이비인후과 / 기타 질환",
+                        "behaviors": [
+                                    "무리한 운동 피하고 휴식"
+                        ],
+                        "goodFoods": [
+                                    "비타민 B complex",
+                                    "코엔자임Q10"
+                        ],
+                        "badFoods": [
+                                    "정제 설탕",
+                                    "카페인 낭남"
+                        ]
+            },
+            {
+                        "name": "수족냉증",
+                        "category": "안과 / 이비인후과 / 기타 질환",
+                        "behaviors": [
+                                    "따뜻한 족욕",
+                                    "장갑/수면바지"
+                        ],
+                        "goodFoods": [
+                                    "생강",
+                                    "대추",
+                                    "마늘"
+                        ],
+                        "badFoods": [
+                                    "찬물",
+                                    "냉면",
+                                    "음주"
+                        ]
+            }
+];
+
+        // 상태 변수: 현재 선택된 카테고리와 검색어
+        let currentCategory = "전체";
+        let currentSearchTerm = "";
+
+        // [함수]: 데이터베이스에서 카테고리를 추출하여 상단 필터 버튼을 생성합니다.
+        function renderCategories() {
+            const filterContainer = document.getElementById('categoryFilter');
+            
+            // Set 객체를 사용하여 중복되지 않는 카테고리 배열을 만듭니다.
+            const categories = ["전체", ...new Set(diseases.map(d => d.category))];
+            
+            filterContainer.innerHTML = ''; // 초기화
+            
+            categories.forEach(category => {
+                const btn = document.createElement('button');
+                btn.textContent = category;
+                
+                // '전체' 버튼을 기본 활성화 상태로 만듭니다.
+                if(category === "전체") btn.classList.add('active'); 
+                
+                // 버튼 클릭 시 발생하는 동작을 정의합니다.
+                btn.onclick = () => {
+                    // 1. 모든 카테고리 버튼의 활성화(active) 클래스를 제거합니다.
+                    document.querySelectorAll('.category-filter button').forEach(b => b.classList.remove('active'));
+                    
+                    // 2. 클릭한 버튼에만 활성화 클래스를 추가합니다.
+                    btn.classList.add('active');
+                    
+                    // 3. 현재 카테고리 상태를 변경하고 질환 목록을 다시 필터링합니다.
+                    currentCategory = category;
+                    filterDiseases();
+                };
+                filterContainer.appendChild(btn);
+            });
+        }
+
+        // [함수]: 현재 선택된 카테고리와 검색어에 맞춰 질환 목록을 화면에 표시합니다.
+        function filterDiseases() {
+            currentSearchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            const listContainer = document.getElementById('diseaseList');
+            
+            listContainer.innerHTML = '';
+            document.getElementById('resultArea').style.display = 'none'; // 목록이 바뀌면 열려있던 결과(카드) 창은 숨깁니다.
+
+            // 선택된 카테고리와 검색어를 모두 만족하는 질환만 걸러냅니다.
+            const filtered = diseases.filter(d => {
+                const matchCategory = currentCategory === "전체" || d.category === currentCategory;
+                const matchSearch = d.name.toLowerCase().includes(currentSearchTerm);
+                return matchCategory && matchSearch;
+            });
+
+            // 일치하는 질환이 없을 경우 메시지를 표시합니다.
+            if (filtered.length === 0) {
+                listContainer.innerHTML = '<div class="empty-message">검색 조건에 맞는 질환이 없습니다.</div>';
+                return;
+            }
+
+            // 걸러진 질환들을 카드 형태의 리스트로 만들어 화면에 추가합니다.
+            filtered.forEach(d => {
+                const item = document.createElement('div');
+                item.className = 'disease-card';
+                
+                item.innerHTML = `
+                    <div class="disease-info">
+                        <h3>${d.name}</h3>
+                        <span class="category-badge">${d.category}</span>
+                    </div>
+                `;
+                
+                // 질환 항목 클릭 시 상세 정보(카드)를 띄우는 이벤트를 추가합니다.
+                item.onclick = () => {
+                    // 선택된 항목 UI 하이라이트
+                    document.querySelectorAll('.disease-card').forEach(el => el.classList.remove('selected'));
+                    item.classList.add('selected');
+                    
+                    // 질환 상세 정보 렌더링 함수 호출
+                    showDiseaseDetails(d);
+                };
+                
+                listContainer.appendChild(item);
+            });
+        }
+
+        // [함수]: 특정 질환을 클릭했을 때 화면 하단에 3가지 맞춤 카드를 표시합니다.
+        function showDiseaseDetails(disease) {
+            // 목록과 검색창 등을 숨깁니다. (화면 전환 효과)
+            document.querySelector('.search-section').style.display = 'none';
+            document.getElementById('categoryFilter').style.display = 'none';
+            document.getElementById('diseaseList').style.display = 'none';
+            
+            document.getElementById('resultArea').style.display = 'block'; // 숨겨져 있던 결과 영역을 보이게 합니다.
+            window.scrollTo(0, 0); // 화면 최상단으로 이동합니다.
+            document.getElementById('resultTitle').textContent = `[${disease.category}] ${disease.name} 관리 가이드`;
+
+            // 1. 생활 수칙 리스트 채우기
+            const behaviorUl = document.getElementById('behaviorList');
+            behaviorUl.innerHTML = '';
+            disease.behaviors.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                behaviorUl.appendChild(li);
+            });
+
+            // 2. 추천 식품 리스트 채우기
+            const goodFoodUl = document.getElementById('goodFoodList');
+            goodFoodUl.innerHTML = '';
+            disease.goodFoods.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                goodFoodUl.appendChild(li);
+            });
+
+            // 3. 금기 식품 리스트 채우기
+            const badFoodUl = document.getElementById('badFoodList');
+            badFoodUl.innerHTML = '';
+            disease.badFoods.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                badFoodUl.appendChild(li);
+            });
+        }
+
+        // [함수]: 결과 화면에서 다시 목록 화면으로 되돌아갑니다.
+        function goBackToList() {
+            // 검색 영역과 목록을 다시 보이게 합니다.
+            document.querySelector('.search-section').style.display = 'flex';
+            document.getElementById('categoryFilter').style.display = 'flex';
+            document.getElementById('diseaseList').style.display = 'grid';
+            
+            // 결과 영역을 숨깁니다.
+            document.getElementById('resultArea').style.display = 'none';
+            
+            // 선택된 항목 표시를 제거합니다.
+            document.querySelectorAll('.disease-card').forEach(el => el.classList.remove('selected'));
+            window.scrollTo(0, 0);
+        }
+
+        // [함수]: 고령자분들을 위해 전체적인 글자 크기를 조절합니다.
+        let currentFontSize = 16; // 기본 글자 크기는 16px 입니다.
+        function changeFontSize(amount) {
+            currentFontSize += amount;
+            
+            // 너무 작거나 너무 커지지 않도록 한계값을 설정합니다. (12px ~ 26px)
+            if (currentFontSize < 12) currentFontSize = 12;
+            if (currentFontSize > 26) currentFontSize = 26;
+            
+            // HTML의 루트 스타일 변수(--base-font-size)를 변경하여 전체 크기를 조절합니다.
+            document.documentElement.style.setProperty('--base-font-size', currentFontSize + 'px');
+        }
+
+        // 브라우저가 화면을 모두 불러온 후 가장 먼저 실행되는 함수들입니다.
+        window.onload = () => {
+            renderCategories(); // 카테고리 필터 버튼 렌더링
+            filterDiseases();   // 전체 질환 목록 렌더링
+        };
+    </script>
+</body>
+</html>
